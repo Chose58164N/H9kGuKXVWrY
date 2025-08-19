@@ -1,0 +1,34 @@
+version: 2.1
+orbs:
+  python: circleci/python@1.5.0
+  codecov: codecov/codecov@3.2.2
+
+jobs:
+  build:
+    executor: python/default
+    #docker:
+    #  - image: cimg/python:3.9.6 <--not needed if using executor:python/default
+    steps:
+      - checkout
+      - run:
+          name: Install
+          command: |
+            pip install -r requirements.txt
+            pip install .
+            pip install coverage
+            #pip install codecov <-- (not needed if using the "codecov" org)
+      - run:
+          name: Run Tests
+          command: |
+            coverage run tests/test_superpose3d.py
+            coverage xml
+      - codecov/upload
+
+workflow:
+  version: 2.1
+  build-test:
+    jobs:
+      - build
+
+# This file was adapted from:
+# https://github.com/codecov/example-python/blob/master/.circleci/config.yml
